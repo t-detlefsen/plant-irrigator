@@ -23,7 +23,7 @@ This is a repository for an automated plant irrigator.
 | LED Display | LTA-1000G | 1 |
 
 ### To-Do's
-- Design system (keep expansion in mind)
-- Make electronic schematic
 - Order moisture sensor connector
+- Get sensor working with Arduino Pro Mini
+- Make electronic schematic (sensor + pump => Arduino => Pi)
 - Look into setting up website on Pi
