@@ -1,6 +1,6 @@
 /*********
   Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/esp32-web-server-sent-events-sse/
+  Complete project details at https://RandomNerdTutorials.com
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files.
@@ -9,172 +9,111 @@
   copies or substantial portions of the Software.
 *********/
 
-#include <WiFi.h>
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
+// Import required libraries
+#ifdef ESP32
+  #include <WiFi.h>
+  #include <ESPAsyncWebServer.h>
+  #include <SPIFFS.h>
+#else
+  #include <Arduino.h>
+  #include <ESP8266WiFi.h>
+  #include <Hash.h>
+  #include <ESPAsyncTCP.h>
+  #include <ESPAsyncWebServer.h>
+  #include <FS.h>
+#endif
+#include <Wire.h>
 #include <Adafruit_AHTX0.h>
 
+/*#include <SPI.h>
+#define BME_SCK 18
+#define BME_MISO 19
+#define BME_MOSI 23
+#define BME_CS 5*/
+
+Adafruit_AHTX0 aht;
+//Adafruit_BME280 bme(BME_CS); // hardware SPI
+//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
+
 // Replace with your network credentials
-const char* ssid = "<NETWORK>";
-const char* password = "<PASSWORD>";
+const char* ssid = "NETWORK";
+const char* password = "PASSWORD";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
-// Create an Event Source on /events
-AsyncEventSource events("/events");
+String readBME280Temperature() {
+  // Read temperature as Celsius (the default)
+  sensors_event_t humidity, temp;
+  aht.getEvent(&humidity, &temp);
+  float t = temp.temperature;
+  // Convert temperature to Fahrenheit
+  t = 1.8 * t + 32;
+  if (isnan(t)) {    
+    Serial.println("Failed to read from AHTX0 sensor!");
+    return "";
+  }
+  else {
+    Serial.println(t);
+    return String(t);
+  }
+}
 
-// Timer variables
-unsigned long lastTime = 0;  
-unsigned long timerDelay = 30000;
+String readBME280Humidity() {
+  sensors_event_t humidity, temp;
+  aht.getEvent(&humidity, &temp);
+  float h = humidity.relative_humidity;
+  if (isnan(h)) {
+    Serial.println("Failed to read from AHTX0 sensor!");
+    return "";
+  }
+  else {
+    Serial.println(h);
+    return String(h);
+  }
+}
 
-// Create a sensor object
-Adafruit_AHTX0 aht;
-
-float temperature;
-float humidity;
-
-// Init BME280
-void initBME(){
-    if (! aht.begin()) {
+void setup(){
+  // Serial port for debugging purposes
+  Serial.begin(115200);
+  
+  if (! aht.begin()) {
     Serial.println("Could not find AHT? Check wiring");
     while (1) delay(10);
   }
   Serial.println("AHT10 or AHT20 found");
-}
 
-void getSensorReadings(){
-  sensors_event_t hum, temp;
-  aht.getEvent(&hum, &temp);
-  
-  // Convert temperature to Fahrenheit
-  temperature = 1.8 * temp.temperature + 32;
-  humidity = hum.relative_humidity;
-}
-
-// Initialize WiFi
-void initWiFi() {
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    Serial.print("Connecting to WiFi ..");
-    while (WiFi.status() != WL_CONNECTED) {
-        Serial.print('.');
-        delay(1000);
-    }
-    Serial.println(WiFi.localIP());
-}
-
-String processor(const String& var){
-  getSensorReadings();
-  //Serial.println(var);
-  if(var == "TEMPERATURE"){
-    return String(temperature);
+  // Initialize SPIFFS
+  if(!SPIFFS.begin()){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
   }
-  else if(var == "HUMIDITY"){
-    return String(humidity);
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi..");
   }
-  return String();
-}
 
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML><html>
-<head>
-  <title>ESP Web Server</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  <link rel="icon" href="data:,">
-  <style>
-    html {font-family: Arial; display: inline-block; text-align: center;}
-    p { font-size: 1.2rem;}
-    body {  margin: 0;}
-    .topnav { overflow: hidden; background-color: #50B8B4; color: white; font-size: 1rem; }
-    .content { padding: 20px; }
-    .card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }
-    .cards { max-width: 800px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    .reading { font-size: 1.4rem; }
-  </style>
-</head>
-<body>
-  <div class="topnav">
-    <h1>AHTX0 WEB SERVER (SSE)</h1>
-  </div>
-  <div class="content">
-    <div class="cards">
-      <div class="card">
-        <p><i class="fas fa-thermometer-half" style="color:#059e8a;"></i> TEMPERATURE</p><p><span class="reading"><span id="temp">%TEMPERATURE%</span> &deg;F</span></p>
-      </div>
-      <div class="card">
-        <p><i class="fas fa-tint" style="color:#00add6;"></i> HUMIDITY</p><p><span class="reading"><span id="hum">%HUMIDITY%</span> &percnt; rH</span></p>
-      </div>
-    </div>
-  </div>
-<script>
-if (!!window.EventSource) {
- var source = new EventSource('/events');
- 
- source.addEventListener('open', function(e) {
-  console.log("Events Connected");
- }, false);
- source.addEventListener('error', function(e) {
-  if (e.target.readyState != EventSource.OPEN) {
-    console.log("Events Disconnected");
-  }
- }, false);
- 
- source.addEventListener('message', function(e) {
-  console.log("message", e.data);
- }, false);
- 
- source.addEventListener('temperature', function(e) {
-  console.log("temperature", e.data);
-  document.getElementById("temp").innerHTML = e.data;
- }, false);
- 
- source.addEventListener('humidity', function(e) {
-  console.log("humidity", e.data);
-  document.getElementById("hum").innerHTML = e.data;
- }, false);
-}
-</script>
-</body>
-</html>)rawliteral";
+  // Print ESP32 Local IP Address
+  Serial.println(WiFi.localIP());
 
-void setup() {
-  Serial.begin(115200);
-  initWiFi();
-  initBME();
-
-
-  // Handle Web Server
+  // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
+    request->send(SPIFFS, "/index.html");
+  });
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readBME280Temperature().c_str());
+  });
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readBME280Humidity().c_str());
   });
 
-  // Handle Web Server Events
-  events.onConnect([](AsyncEventSourceClient *client){
-    if(client->lastId()){
-      Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-    }
-    // send event with message "hello!", id current millis
-    // and set reconnect delay to 1 second
-    client->send("hello!", NULL, millis(), 10000);
-  });
-  server.addHandler(&events);
+  // Start server
   server.begin();
 }
-
-void loop() {
-  if ((millis() - lastTime) > timerDelay) {
-    getSensorReadings();
-    Serial.printf("Temperature = %.2f ºF \n", temperature);
-    Serial.printf("Humidity = %.2f \n", humidity);
-    Serial.println();
-
-    // Send Events to the Web Server with the Sensor Readings
-    events.send("ping",NULL,millis());
-    events.send(String(temperature).c_str(),"temperature",millis());
-    events.send(String(humidity).c_str(),"humidity",millis());
-    
-    lastTime = millis();
-  }
+ 
+void loop(){
+  
 }
