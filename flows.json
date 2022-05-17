@@ -1,0 +1,237 @@
+[
+    {
+        "id": "b2de096036993e88",
+        "type": "tab",
+        "label": "Flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1a70f457d11f280a",
+        "type": "mqtt-broker",
+        "name": "Rasbperry Pi",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "c3a84d64170fa462",
+        "type": "ui_tab",
+        "name": "Window Sill",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "457a35c012e8c66d",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-dark",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#007c41",
+                "baseFont": "Verdana,Verdana,Geneva,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "reset": false
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#097479",
+                    "value": "#007c41",
+                    "edited": true
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#007c41",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#00c869",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#555555",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#eeeeee",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#007c41",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "Verdana,Verdana,Geneva,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "d3612f0690aadf1d",
+        "type": "ui_group",
+        "name": "Basil",
+        "tab": "c3a84d64170fa462",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "27acd6eb8f3c1bfa",
+        "type": "ui_group",
+        "name": "Environment",
+        "tab": "c3a84d64170fa462",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "2b27e5bb84fc03ce",
+        "type": "mqtt in",
+        "z": "b2de096036993e88",
+        "name": "Environment-MQTT",
+        "topic": "window_sill",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "1a70f457d11f280a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 140,
+        "wires": [
+            [
+                "616763c067a0b04f"
+            ]
+        ]
+    },
+    {
+        "id": "2fb854dd5b0f2969",
+        "type": "ui_text",
+        "z": "b2de096036993e88",
+        "group": "27acd6eb8f3c1bfa",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temperature",
+        "format": "{{payload.temperature}} °F",
+        "layout": "row-spread",
+        "className": "",
+        "x": 570,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "616763c067a0b04f",
+        "type": "json",
+        "z": "b2de096036993e88",
+        "name": "E-Parser",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 400,
+        "y": 140,
+        "wires": [
+            [
+                "2fb854dd5b0f2969",
+                "f1c9fabebf5782d2"
+            ]
+        ]
+    },
+    {
+        "id": "f1c9fabebf5782d2",
+        "type": "ui_text",
+        "z": "b2de096036993e88",
+        "group": "27acd6eb8f3c1bfa",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Humidity",
+        "format": "{{payload.humidity}} %",
+        "layout": "row-spread",
+        "className": "",
+        "x": 580,
+        "y": 180,
+        "wires": []
+    }
+]
