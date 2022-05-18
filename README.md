@@ -17,13 +17,13 @@ This is a repository for an automated plant irrigator.
 | Part  | Item Number | Quantity |
 | ------------- | ------------- | ------------- |
 | Raspberry Pi 3 Model B | N/A | 1 |
-| Peristaltic Liquid Pump  | N/A | 1 |
+| HiLetgo ESP32 | ESP-WROOM-32 | 1 |
+| Temperature and Humidity Sensor | AHT20 | 1 |
 | Capacitive Moisture Sensor | N/A | 1 |
-| JST PH 2mm 4-Pin to Male Header Cable | N/A | 1 |
-| LED Display | LTA-1000G | 1 |
 
 ### To-Do's
-- Order moisture sensor connector
-- Get sensor working with Arduino Pro Mini
+- Test Moisture Sensor over long periods to determine constants
+- Track soil moisture over time
+- Connect pump to ESP32 and issue commands via MQTT
 - Make electronic schematic (sensor + pump => Arduino => Pi)
-- Look into setting up website on Pi
+- Reorganize GitHub
