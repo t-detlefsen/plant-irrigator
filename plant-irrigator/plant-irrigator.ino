@@ -1,60 +1,45 @@
-/*********
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com  
-*********/
+/* @author: Thomas Detlefsen
+ * @info: Publish temperature, humidity, and 
+ *        soil moisture to an MQTT broker
+ */
 
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <Wire.h>
 #include <Adafruit_AHTX0.h>
 
-// Replace the next variables with your SSID/Password combination
 const char* ssid = "SSID_NAME";
 const char* password = "PASSWORD";
-
-// Add your MQTT Broker IP address, example:
-const char* mqtt_server = "192.168.1.87";
+const char* mqtt_server = "MQTT_ADDRESS";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
 int msgID = 0;
 char msgString[20];
+const int updateTime = 1200;
 
-//uncomment the following lines if you're using SPI
-/*#include <SPI.h>
-#define BME_SCK 18
-#define BME_MISO 19
-#define BME_MOSI 23
-#define BME_CS 5*/
-
-Adafruit_AHTX0 aht; // I2C
-const int moistPin = 34;
-const int AirValue = 305;
-const int WaterValue = 145;
+Adafruit_AHTX0 aht;
+const int moisturePin = 34;
+const int AirValue = 3550;
+const int WaterValue = 1600;
 
 float temperature = 0;
 float humidity = 0;
-float moistureRes = 0;
-float moisturePrev = 0;
+int moistureRes = 0;
 float moisture = 0;
-
-bool flagUp = false;
 
 void setup() {
   Serial.begin(115200);
-  // default settings
-  // (you can also pass in a Wire library object like &Wire2)
-  //status = bme.begin();  
+  
   if (! aht.begin()) {
     Serial.println("Could not find AHT? Check wiring");
     while (1) delay(10);
-  }
-  Serial.println("AHT10 or AHT20 found");
+  } Serial.println("AHT10 or AHT20 found");
   
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
+  // client.setCallback(callback);
 }
 
 void setup_wifi() {
@@ -77,33 +62,6 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void callback(char* topic, byte* message, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
-  String messageTemp;
-  
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)message[i]);
-    messageTemp += (char)message[i];
-  }
-  Serial.println();
-
-  // Feel free to add more if statements to control more GPIOs with MQTT
-
-  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
-  // Changes the output state according to the message
-  if (String(topic) == "esp32/output") {
-    Serial.print("Changing output to ");
-    if(messageTemp == "on"){
-      Serial.println("on");
-    }
-    else if(messageTemp == "off"){
-      Serial.println("off");
-    }
-  }
-}
-
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -122,6 +80,34 @@ void reconnect() {
     }
   }
 }
+
+//void callback(char* topic, byte* message, unsigned int length) {
+//  Serial.print("Message arrived on topic: ");
+//  Serial.print(topic);
+//  Serial.print(". Message: ");
+//  String messageTemp;
+//  
+//  for (int i = 0; i < length; i++) {
+//    Serial.print((char)message[i]);
+//    messageTemp += (char)message[i];
+//  }
+//  Serial.println();
+//
+//  // Feel free to add more if statements to control more GPIOs with MQTT
+//
+//  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
+//  // Changes the output state according to the message
+//  if (String(topic) == "esp32/output") {
+//    Serial.print("Changing output to ");
+//    if(messageTemp == "on"){
+//      Serial.println("on");
+//    }
+//    else if(messageTemp == "off"){
+//      Serial.println("off");
+//    }
+//  }
+//}
+
 void loop() {
   if (!client.connected()) {
     reconnect();
@@ -129,51 +115,38 @@ void loop() {
   client.loop();
 
   long now = millis();
-  if (now - lastMsg > 1200000) {
+  if (now - lastMsg > updateTime * 1000) {
     lastMsg = now;
     
-    // Temperature in Celsius
+    // Get sensor values
     sensors_event_t humid, temp;
-    aht.getEvent(&humid, &temp);   
+    aht.getEvent(&humid, &temp);
     temperature = 1.8 * temp.temperature + 32; // Temperature in Fahrenheit
 
-    // Convert the value to a char array
-    sprintf(msgString, "%d", msgID);
-    
-    // Convert the value to a char array
+    humidity = humid.relative_humidity;
+
+    moistureRes = analogRead(moisturePin);
+    moisture = map(moistureRes, AirValue, WaterValue, 0, 100);
+
+    // Print sensor values to serial
     char tempString[8];
     dtostrf(temperature, 1, 2, tempString);
     Serial.print("Temperature: ");
     Serial.println(tempString);
-
-    humidity = humid.relative_humidity;
     
-    // Convert the value to a char array
     char humString[8];
     dtostrf(humidity, 1, 2, humString);
     Serial.print("Humidity: ");
     Serial.println(humString);
 
-    moisture = 0;
-    char moistString3[8];
-    for (int i = 0; i < 100; i++) {
-      moisture += analogRead(moistPin);
-      delay(2);
-    }
-
-    moisture /= 100;
-
-    moisture = map(moisture, AirValue, WaterValue, 0, 100);
-
-    // Convert the value to a char array
     char moistString[8];
     dtostrf(moisture, 1, 2, moistString);
-    char moistString2[8];
-    dtostrf(moisturePrev, 1, 2, moistString2);
     Serial.print("Moisture: ");
     Serial.println(moistString);
-    Serial.println(moistString2);
+    
+    sprintf(msgString, "%d", msgID);
 
+    // Format values as JSON for MQTT transfer
     char payload[100] = "{\n";
     strcat(payload, "\t\"_msgid\": ");
     strcat(payload, msgString);
@@ -183,8 +156,6 @@ void loop() {
     strcat(payload, humString);
     strcat(payload, "\n}");
 
-    client.publish("window_sill", payload);
-
     char plantload[100] = "{\n";
     strcat(plantload, "\t\"_msgid\": ");
     strcat(plantload, msgString);
@@ -192,6 +163,8 @@ void loop() {
     strcat(plantload, moistString);
     strcat(plantload, "\n}");
 
+    // Publish message
+    client.publish("window_sill", payload);
     client.publish("basil", plantload);
 
     // Increment Message ID

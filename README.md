@@ -21,8 +21,10 @@ This is a repository for an automated plant irrigator.
 | Temperature and Humidity Sensor | AHT20 | 1 |
 | Capacitive Moisture Sensor | N/A | 1 |
 
+### Resources
+- [ESP32 MQTT – Publish and Subscribe with Arduino IDE](https://randomnerdtutorials.com/esp32-mqtt-publish-subscribe-arduino-ide/)
+
 ### To-Do's
-- Test Moisture Sensor over long periods to determine constants
 - Track soil moisture over time
 - Connect pump to ESP32 and issue commands via MQTT
 - Make electronic schematic (sensor + pump => Arduino => Pi)
