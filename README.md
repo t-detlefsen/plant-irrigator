@@ -1,27 +1,7 @@
 # Broker - Subscriber
-INFO ABOUT BRANCH
+This repository is for the automated watering of a single plant using an ESP32 communicating with a Raspberry Pi over MQTT. The system can be controlled and monitorred using a web interface using Node-RED.
 
-### File Structure
+This branch contains the Node-RED flow to be deployed onto the Raspberry Pi.
 
-```
-├── plant-irrigator
-│   ├── README
-│   ├── software
-│   │   ├── ...
-│   ├── hardware
-│   │   ├── ...
-```
-
-### Dependencies
-- Mosquitto MQTT Broker
-- Node-RED
-- https://randomnerdtutorials.com/getting-started-with-node-red-dashboard/
-
-### Message Format
-```
-{
-  "_msgid": 1,
-  "temperature": 75,
-  "humidity": 51
-}
-```
+### Resources
+- [Getting Started with Node-RED Dashboard on Raspberry Pi](https://randomnerdtutorials.com/getting-started-with-node-red-dashboard/)
