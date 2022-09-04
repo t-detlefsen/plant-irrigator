@@ -1,7 +1,7 @@
 # DIY Automated Plant Irrigator
-This repository is for the automated watering of a single plant using an ESP32 communicating with a Raspberry Pi over MQTT. The system can be controlled and monitorred using a web interface using node-red.
+This repository is for the automated watering of a single plant using an ESP32 communicating with a Raspberry Pi over MQTT. The system can be controlled and monitorred using a web interface using node-RED.
 
-This branch contains the the code to be deployed onto the arduino.
+This branch contains the code to be deployed onto the arduino.
 
 ### Bill of Materials
 
@@ -14,13 +14,14 @@ This branch contains the the code to be deployed onto the arduino.
 | 5V Micro Submersible Mini Pump | N/A | 1 |
 | 1/4" PVC Tubing | N/A | 1 |
 
-### File Structure
-
+### Message Format
+In order to communicate to node-RED using MQTT, the messages have to be formatted as shown below.
 ```
-├── plant-irrigator
-│   ├── README
-│   ├── plant-irrigator
-│   │   ├── plant-irrigator.ino
+{
+  "_msgid": 1,
+  "temperature": 75,
+  "humidity": 51
+}
 ```
 
 ### Next Steps
