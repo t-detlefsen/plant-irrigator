@@ -1,6 +1,6 @@
 [
     {
-        "id": "b2de096036993e88",
+        "id": "b746b29db8bd01c3",
         "type": "tab",
         "label": "Flow",
         "disabled": false,
@@ -122,12 +122,12 @@
             }
         },
         "site": {
-            "name": "Node-RED Dashboard",
+            "name": "Plant-Irrigator",
             "hideToolbar": "false",
             "allowSwipe": "false",
             "lockMenu": "false",
             "allowTempTheme": "true",
-            "dateFormat": "DD/MM/YYYY",
+            "dateFormat": "MM/DD/YYYY",
             "sizes": {
                 "sx": 48,
                 "sy": 48,
@@ -143,29 +143,29 @@
     {
         "id": "d3612f0690aadf1d",
         "type": "ui_group",
-        "name": "Basil",
+        "name": "Arugula",
         "tab": "c3a84d64170fa462",
-        "order": 2,
+        "order": 3,
         "disp": true,
         "width": "6",
         "collapse": false,
         "className": ""
     },
     {
-        "id": "27acd6eb8f3c1bfa",
+        "id": "b27ded89b5355e9c",
         "type": "ui_group",
         "name": "Environment",
         "tab": "c3a84d64170fa462",
-        "order": 1,
+        "order": 2,
         "disp": true,
-        "width": "6",
+        "width": 6,
         "collapse": false,
         "className": ""
     },
     {
-        "id": "2b27e5bb84fc03ce",
+        "id": "c2b62981a74eae1c",
         "type": "mqtt in",
-        "z": "b2de096036993e88",
+        "z": "b746b29db8bd01c3",
         "name": "Environment-MQTT",
         "topic": "window_sill",
         "qos": "0",
@@ -179,31 +179,31 @@
         "y": 140,
         "wires": [
             [
-                "616763c067a0b04f"
+                "4f82448631f46cc9"
             ]
         ]
     },
     {
-        "id": "2fb854dd5b0f2969",
+        "id": "8a09a0a7170ac640",
         "type": "ui_text",
-        "z": "b2de096036993e88",
-        "group": "27acd6eb8f3c1bfa",
-        "order": 0,
+        "z": "b746b29db8bd01c3",
+        "group": "b27ded89b5355e9c",
+        "order": 1,
         "width": 0,
         "height": 0,
         "name": "",
         "label": "Temperature",
-        "format": "{{payload.temperature}} °F",
-        "layout": "row-spread",
+        "format": "{{msg.payload}} °F",
+        "layout": "row-center",
         "className": "",
-        "x": 570,
+        "x": 810,
         "y": 140,
         "wires": []
     },
     {
-        "id": "616763c067a0b04f",
+        "id": "4f82448631f46cc9",
         "type": "json",
-        "z": "b2de096036993e88",
+        "z": "b746b29db8bd01c3",
         "name": "E-Parser",
         "property": "payload",
         "action": "",
@@ -212,26 +212,414 @@
         "y": 140,
         "wires": [
             [
-                "2fb854dd5b0f2969",
-                "f1c9fabebf5782d2"
+                "ef0f1f58848857f0",
+                "a069073657c8045d"
             ]
         ]
     },
     {
-        "id": "f1c9fabebf5782d2",
+        "id": "97437ae08584d640",
         "type": "ui_text",
-        "z": "b2de096036993e88",
-        "group": "27acd6eb8f3c1bfa",
-        "order": 0,
+        "z": "b746b29db8bd01c3",
+        "group": "b27ded89b5355e9c",
+        "order": 3,
         "width": 0,
         "height": 0,
         "name": "",
         "label": "Humidity",
-        "format": "{{payload.humidity}} %",
-        "layout": "row-spread",
+        "format": "{{msg.payload}} %",
+        "layout": "row-center",
         "className": "",
-        "x": 580,
-        "y": 180,
+        "x": 820,
+        "y": 220,
         "wires": []
+    },
+    {
+        "id": "72d659bf7994f24d",
+        "type": "ui_chart",
+        "z": "b746b29db8bd01c3",
+        "name": "",
+        "group": "b27ded89b5355e9c",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "24",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 830,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ef0f1f58848857f0",
+        "type": "function",
+        "z": "b746b29db8bd01c3",
+        "name": "Temp-Parse",
+        "func": "var out = {};\nout.payload = msg.payload.temperature\nreturn out;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 140,
+        "wires": [
+            [
+                "72d659bf7994f24d",
+                "8a09a0a7170ac640"
+            ]
+        ]
+    },
+    {
+        "id": "a069073657c8045d",
+        "type": "function",
+        "z": "b746b29db8bd01c3",
+        "name": "Hum-Parse",
+        "func": "var out = {};\nout.payload = msg.payload.humidity\nreturn out;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 180,
+        "wires": [
+            [
+                "97437ae08584d640",
+                "535dd035054f7905"
+            ]
+        ]
+    },
+    {
+        "id": "535dd035054f7905",
+        "type": "ui_chart",
+        "z": "b746b29db8bd01c3",
+        "name": "",
+        "group": "b27ded89b5355e9c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "24",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 830,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b99735f09b5f1005",
+        "type": "mqtt in",
+        "z": "b746b29db8bd01c3",
+        "name": "Basil-MQTT",
+        "topic": "basil",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "1a70f457d11f280a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 300,
+        "wires": [
+            [
+                "88a55a9cbd2548d3"
+            ]
+        ]
+    },
+    {
+        "id": "88a55a9cbd2548d3",
+        "type": "json",
+        "z": "b746b29db8bd01c3",
+        "name": "E-Parser",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "07be19e0ac8319cc"
+            ]
+        ]
+    },
+    {
+        "id": "07be19e0ac8319cc",
+        "type": "function",
+        "z": "b746b29db8bd01c3",
+        "name": "Moist-Parse",
+        "func": "var out = {};\nout.payload = msg.payload.moisture\nreturn out;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 300,
+        "wires": [
+            [
+                "7146ed79ff2a4799",
+                "029b170de8ed7b59"
+            ]
+        ]
+    },
+    {
+        "id": "7146ed79ff2a4799",
+        "type": "ui_text",
+        "z": "b746b29db8bd01c3",
+        "group": "d3612f0690aadf1d",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Moisture",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 820,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "029b170de8ed7b59",
+        "type": "ui_chart",
+        "z": "b746b29db8bd01c3",
+        "name": "",
+        "group": "d3612f0690aadf1d",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "24",
+        "removeOlderPoints": "100",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 830,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "06f92a47d9046de6",
+        "type": "ui_slider",
+        "z": "b746b29db8bd01c3",
+        "name": "Water-Slider",
+        "label": "",
+        "tooltip": "",
+        "group": "d3612f0690aadf1d",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "end",
+        "topic": "topic",
+        "topicType": "msg",
+        "min": "1",
+        "max": "30",
+        "step": 1,
+        "className": "",
+        "x": 190,
+        "y": 440,
+        "wires": [
+            [
+                "7248a53a9b4d05dc"
+            ]
+        ]
+    },
+    {
+        "id": "8cbc8c1ad99d4698",
+        "type": "ui_button",
+        "z": "b746b29db8bd01c3",
+        "name": "Water-Button",
+        "group": "d3612f0690aadf1d",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Water Plant",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "0",
+        "payloadType": "num",
+        "topic": "payload",
+        "topicType": "msg",
+        "x": 190,
+        "y": 480,
+        "wires": [
+            [
+                "fdb5147d45c9ad0d"
+            ]
+        ]
+    },
+    {
+        "id": "df4fe2896c5905eb",
+        "type": "ui_text",
+        "z": "b746b29db8bd01c3",
+        "group": "d3612f0690aadf1d",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Manual Water Control (s)",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "className": "",
+        "x": 230,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "f9b86d6427f7defb",
+        "type": "mqtt out",
+        "z": "b746b29db8bd01c3",
+        "name": "Basil-Water-MQTT",
+        "topic": "basil/water",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "1a70f457d11f280a",
+        "x": 790,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "7248a53a9b4d05dc",
+        "type": "change",
+        "z": "b746b29db8bd01c3",
+        "name": "Store-Slider",
+        "rules": [
+            {
+                "t": "set",
+                "p": "UserInput",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 410,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fdb5147d45c9ad0d",
+        "type": "change",
+        "z": "b746b29db8bd01c3",
+        "name": "Retrieve-Slider",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "UserInput",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 420,
+        "y": 480,
+        "wires": [
+            [
+                "f9b86d6427f7defb"
+            ]
+        ]
     }
 ]
