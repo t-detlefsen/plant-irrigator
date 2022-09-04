@@ -29,8 +29,13 @@ float humidity = 0;
 int moistureRes = 0;
 float moisture = 0;
 
+const int buttonPin = 4;
+const int pumpPin =  5;
+
 void setup() {
   Serial.begin(115200);
+  pinMode(buttonPin, INPUT);
+  pinMode(pumpPin, OUTPUT);
   
   if (! aht.begin()) {
     Serial.println("Could not find AHT? Check wiring");
@@ -38,8 +43,8 @@ void setup() {
   } Serial.println("AHT10 or AHT20 found");
   
   setup_wifi();
+  client.setCallback(callback);
   client.setServer(mqtt_server, 1883);
-  // client.setCallback(callback);
 }
 
 void setup_wifi() {
@@ -70,7 +75,7 @@ void reconnect() {
     if (client.connect("ESP8266Client")) {
       Serial.println("connected");
       // Subscribe
-      client.subscribe("esp32/output");
+      client.subscribe("basil/water");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -81,32 +86,27 @@ void reconnect() {
   }
 }
 
-//void callback(char* topic, byte* message, unsigned int length) {
-//  Serial.print("Message arrived on topic: ");
-//  Serial.print(topic);
-//  Serial.print(". Message: ");
-//  String messageTemp;
-//  
-//  for (int i = 0; i < length; i++) {
+void callback(char* topic, byte* message, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(". Message: ");
+  String messageTemp;
+ 
+  for (int i = 0; i < length; i++) {
 //    Serial.print((char)message[i]);
-//    messageTemp += (char)message[i];
-//  }
-//  Serial.println();
-//
-//  // Feel free to add more if statements to control more GPIOs with MQTT
-//
-//  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
-//  // Changes the output state according to the message
-//  if (String(topic) == "esp32/output") {
-//    Serial.print("Changing output to ");
-//    if(messageTemp == "on"){
-//      Serial.println("on");
-//    }
-//    else if(messageTemp == "off"){
-//      Serial.println("off");
-//    }
-//  }
-//}
+    messageTemp += (char)message[i];
+  }
+  int waterTime = messageTemp.toInt();
+  Serial.print(waterTime);
+  Serial.println();
+
+  Serial.print("Changing output to ");
+  Serial.println("on");
+  digitalWrite(pumpPin, HIGH);
+  delay(waterTime * 1000);
+  Serial.println("off");
+  digitalWrite(pumpPin, LOW);
+}
 
 void loop() {
   if (!client.connected()) {
