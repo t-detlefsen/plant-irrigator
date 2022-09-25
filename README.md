@@ -1,5 +1,5 @@
 # DIY Automated Plant Irrigator
-This repository is for the automated watering of a single plant using an ESP32 communicating with a Raspberry Pi over MQTT. The system can be controlled and monitorred using a web interface using node-RED.
+This repository is for the automated watering of a single plant using an ESP32 communicating with a Raspberry Pi over MQTT. The system can be controlled and monitorred using a web interface using Node-RED.
 
 This branch contains the code to be deployed onto the arduino.
 
@@ -15,7 +15,7 @@ This branch contains the code to be deployed onto the arduino.
 | 1/4" PVC Tubing | N/A | 1 |
 
 ### Message Format
-In order to communicate to node-RED using MQTT, the messages have to be formatted as shown below.
+In order to communicate to Node-RED using MQTT, the messages have to be formatted as shown below.
 ```
 {
   "_msgid": 1,

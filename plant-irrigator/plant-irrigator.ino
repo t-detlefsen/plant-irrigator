@@ -17,7 +17,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 int msgID = 0;
 char msgString[20];
-const int updateTime = 1200;
+const int updateTime = 3600;
 
 Adafruit_AHTX0 aht;
 const int moisturePin = 34;
