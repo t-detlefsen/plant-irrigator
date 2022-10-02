@@ -24,10 +24,5 @@ In order to communicate to Node-RED using MQTT, the messages have to be formatte
 }
 ```
 
-### Next Steps
-- Write temperature + moisture data to file
-- Determine set-point for moisture sensor
-- Setup VS Code IDE
-
 ### Resources
 - [ESP32 MQTT – Publish and Subscribe with Arduino IDE](https://randomnerdtutorials.com/esp32-mqtt-publish-subscribe-arduino-ide/)
