@@ -169,5 +169,13 @@ void loop() {
 
     // Increment Message ID
     msgID++;
+
+    // Water if moisture is below threshold
+    if (moisture < 30) {
+      digitalWrite(pumpPin, HIGH);
+      delay(30 * 1000);
+      Serial.println("off");
+      digitalWrite(pumpPin, LOW);
+    }
   }
 }
